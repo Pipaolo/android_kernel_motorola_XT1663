@@ -132,6 +132,16 @@
 /**************************
  * GPU DVFS OPP table setting
  ***************************/
+#ifdef CONFIG_MTK_GPU_OC
+  #define GPU_DVFS_FREQT1 (CONFIG_MTK_GPU_FREQT)	// 81900 by default
+  #define MTK_XT1663_TURBO
+#else
+  #ifdef MTK_XT1663_TURBO
+    #define GPU_DVFS_FREQT1 (819000)
+    #define GPU_DVFS_FREQT0 (728000)   // KHz
+#endif
+#endif
+
 #define GPU_DVFS_FREQT	 (806000)	/* KHz */
 #define GPU_DVFS_FREQ0	 (728000)	/* KHz */
 #define GPU_DVFS_FREQ0_1 (676000)	/* KHz */
@@ -293,17 +303,28 @@ static struct mt_gpufreq_table_info mt_gpufreq_opp_tbl_e1_1[] = {
 	GPUOP(GPU_DVFS_FREQ8, GPU_DVFS_VOLT2, 5),
 };
 
-/* MT6755T: 800M Turbo */
-static struct mt_gpufreq_table_info mt_gpufreq_opp_tbl_e1_t[] = {
-	GPUOP(GPU_DVFS_FREQT, GPU_DVFS_VOLT0, 0),
-	GPUOP(GPU_DVFS_FREQ0, GPU_DVFS_VOLT0, 1),
-	GPUOP(GPU_DVFS_FREQ1, GPU_DVFS_VOLT0, 2),
-	GPUOP(GPU_DVFS_FREQ2, GPU_DVFS_VOLT0, 3),
-	GPUOP(GPU_DVFS_FREQ4, GPU_DVFS_VOLT1, 4),
-	GPUOP(GPU_DVFS_FREQ5, GPU_DVFS_VOLT1, 5),
-	GPUOP(GPU_DVFS_FREQ7, GPU_DVFS_VOLT1, 6),
-	GPUOP(GPU_DVFS_FREQ8, GPU_DVFS_VOLT2, 7),
+#ifdef MTK_XT1663_TURBO
+#ifndef CONFIG_MTK_GPU_OC
+static struct mt_gpufreq_table_info mt_gpufreq_opp_tbl_e1_t0[] = {
+    GPUOP(GPU_DVFS_FREQT0, GPU_DVFS_VOLT0, 0),
+    GPUOP(GPU_DVFS_FREQ1, GPU_DVFS_VOLT0, 1),
+    GPUOP(GPU_DVFS_FREQ2, GPU_DVFS_VOLT0, 2),
+    GPUOP(GPU_DVFS_FREQ3, GPU_DVFS_VOLT1, 3),
+    GPUOP(GPU_DVFS_FREQ5, GPU_DVFS_VOLT1, 4),
+    GPUOP(GPU_DVFS_FREQ6, GPU_DVFS_VOLT2, 5),
 };
+#endif
+// 800M Turbo
+static struct mt_gpufreq_table_info mt_gpufreq_opp_tbl_e1_t[] = {
+    GPUOP(GPU_DVFS_FREQT1, GPU_DVFS_VOLT0, 0),
+    GPUOP(GPU_DVFS_FREQ0, GPU_DVFS_VOLT0, 1),
+    GPUOP(GPU_DVFS_FREQ2, GPU_DVFS_VOLT0, 2),
+    GPUOP(GPU_DVFS_FREQ3, GPU_DVFS_VOLT1, 3),
+    GPUOP(GPU_DVFS_FREQ5, GPU_DVFS_VOLT1, 4),
+    GPUOP(GPU_DVFS_FREQ6, GPU_DVFS_VOLT2, 5),
+};
+#endif
+
 #else
 /* For E2 segment, GPU is sourced from Vcore */
 /* E2 Segment1: 680M */
@@ -313,7 +334,6 @@ static struct mt_gpufreq_table_info mt_gpufreq_opp_tbl_e2_0[] = {
 	GPUOP(GPU_DVFS_FREQ4, GPU_DVFS_VOLT1, 1),
 	GPUOP(GPU_DVFS_FREQ8, GPU_DVFS_VOLT3, 2),
 };
-
 /* Segment2: 520M */
 /* MT6750N */
 static struct mt_gpufreq_table_info mt_gpufreq_opp_tbl_e2_1[] = {
@@ -349,6 +369,7 @@ static struct mt_gpufreq_table_info mt_gpufreq_opp_tbl_e1_t[] = {
 	GPUOP(GPU_DVFS_FREQ8, GPU_DVFS_VOLT2, 7),
 };
 #endif
+
 
 /*
  * AEE (SRAM debug)
@@ -2944,14 +2965,18 @@ static int mt_gpufreq_pdrv_probe(struct platform_device *pdev)
 	else if (mt_gpufreq_dvfs_table_type == 1)	/* Segment2: 550M */
 		mt_setup_gpufreqs_table(mt_gpufreq_opp_tbl_e1_1,
 					ARRAY_SIZE(mt_gpufreq_opp_tbl_e1_1));
+#ifdef MTK_XT1663_TURBO
 	else if (mt_gpufreq_dvfs_table_type == 3)	/* 800M for turbo segment */
 		mt_setup_gpufreqs_table(mt_gpufreq_opp_tbl_e1_t,
 					ARRAY_SIZE(mt_gpufreq_opp_tbl_e1_t));
-	else
-		mt_setup_gpufreqs_table(mt_gpufreq_opp_tbl_e1_0,
-					ARRAY_SIZE(mt_gpufreq_opp_tbl_e1_0));
-#endif
+#ifndef CONFIG_MTK_GPU_OC
 
+	else if	(mt_gpufreq_dvfs_table_type == 10)
+            mt_setup_gpufreqs_table(mt_gpufreq_opp_tbl_e1_t0,
+					ARRAY_SIZE(mt_gpufreq_opp_tbl_e1_t0));
+#endif
+#endif
+#endif
 	/**********************
 	 * setup PMIC init value
 	 ***********************/

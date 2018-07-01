@@ -4,6 +4,9 @@ SUBLEVEL = 113
 EXTRAVERSION =
 NAME = Shuffling Zombie Juror
 
+# Added this so that camera will work
+export TARGET_PRODUCT := kungfu_m
+
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
 # More info can be located in ./README

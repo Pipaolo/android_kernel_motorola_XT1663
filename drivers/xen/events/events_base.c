@@ -763,8 +763,8 @@ out:
 	mutex_unlock(&irq_mapping_update_lock);
 	return irq;
 error_irq:
-	while (nvec--)
-		__unbind_from_irq(irq + nvec);
+	for (; i >= 0; i--)
+		__unbind_from_irq(irq + i);
 	mutex_unlock(&irq_mapping_update_lock);
 	return ret;
 }

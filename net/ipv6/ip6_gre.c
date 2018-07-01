@@ -320,13 +320,11 @@ static struct ip6_tnl *ip6gre_tunnel_locate(struct net *net,
 	if (t || !create)
 		return t;
 
-	if (parms->name[0]) {
-		if (!dev_valid_name(parms->name))
-			return NULL;
+	if (parms->name[0])
 		strlcpy(name, parms->name, IFNAMSIZ);
-	} else {
+	else
 		strcpy(name, "ip6gre%d");
-	}
+
 	dev = alloc_netdev(sizeof(*t), name, NET_NAME_UNKNOWN,
 			   ip6gre_tunnel_setup);
 	if (!dev)
@@ -411,16 +409,13 @@ static void ip6gre_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
 	case ICMPV6_DEST_UNREACH:
 		net_warn_ratelimited("%s: Path to destination invalid or inactive!\n",
 				     t->parms.name);
-		if (code != ICMPV6_PORT_UNREACH)
-			break;
-		return;
+		break;
 	case ICMPV6_TIME_EXCEED:
 		if (code == ICMPV6_EXC_HOPLIMIT) {
 			net_warn_ratelimited("%s: Too small hop limit or routing loop in tunnel!\n",
 					     t->parms.name);
-			break;
 		}
-		return;
+		break;
 	case ICMPV6_PARAMPROB:
 		teli = 0;
 		if (code == ICMPV6_HDR_FIELD)
@@ -436,13 +431,13 @@ static void ip6gre_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
 			net_warn_ratelimited("%s: Recipient unable to parse tunneled packet!\n",
 					     t->parms.name);
 		}
-		return;
+		break;
 	case ICMPV6_PKT_TOOBIG:
 		mtu = be32_to_cpu(info) - offset;
 		if (mtu < IPV6_MIN_MTU)
 			mtu = IPV6_MIN_MTU;
 		t->dev->mtu = mtu;
-		return;
+		break;
 	}
 
 	if (time_before(jiffies, t->err_time + IP6TUNNEL_ERR_TIMEO))

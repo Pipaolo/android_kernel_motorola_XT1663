@@ -597,6 +597,3 @@ CONFIG_MTK_EMMC_SUPPORT_OTP=y
 ###################### Lenovo BSP Feature end #########################
 #LIVEDISPLAY
 CONFIG_MTK_VIDEOX_LIVEDISPLAY=y
-#GPU OC
-CONFIG_MTK_GPU_OC=y
-#CONFIG_MTK_GPU_FREQT=86000

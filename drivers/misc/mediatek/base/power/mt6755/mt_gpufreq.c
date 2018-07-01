@@ -294,8 +294,6 @@ static struct mt_gpufreq_table_info mt_gpufreq_opp_tbl_e1_1[] = {
 	GPUOP(GPU_DVFS_FREQ8, GPU_DVFS_VOLT2, 5),
 };
 
-#ifdef CONFIG_ARCH_MT6755_TURBO
-
 // 800M Turbo
 static struct mt_gpufreq_table_info mt_gpufreq_opp_tbl_e1_t[] = {
     GPUOP(GPU_DVFS_FREQT, GPU_DVFS_VOLT0, 0),
@@ -305,7 +303,6 @@ static struct mt_gpufreq_table_info mt_gpufreq_opp_tbl_e1_t[] = {
     GPUOP(GPU_DVFS_FREQ5, GPU_DVFS_VOLT1, 4),
     GPUOP(GPU_DVFS_FREQ6, GPU_DVFS_VOLT2, 5),
 };
-#endif
 
 #else
 /* For E2 segment, GPU is sourced from Vcore */
@@ -2947,14 +2944,12 @@ static int mt_gpufreq_pdrv_probe(struct platform_device *pdev)
 	else if (mt_gpufreq_dvfs_table_type == 1)	/* Segment2: 550M */
 		mt_setup_gpufreqs_table(mt_gpufreq_opp_tbl_e1_1,
 					ARRAY_SIZE(mt_gpufreq_opp_tbl_e1_1));
-#ifdef CONFIG_ARCH_MT6755_TURBO
 	else if (mt_gpufreq_dvfs_table_type == 3)	/* 800M for turbo segment */
 		mt_setup_gpufreqs_table(mt_gpufreq_opp_tbl_e1_t,
 					ARRAY_SIZE(mt_gpufreq_opp_tbl_e1_t));
 	else
 		mt_setup_gpufreqs_table(mt_gpufreq_opp_tbl_e1_0,
-					ARRAY_SIZE(mt_gpufreq_opp_tbl_e1_0));
-#endif               
+					ARRAY_SIZE(mt_gpufreq_opp_tbl_e1_0));            
 #endif
 	/**********************
 	 * setup PMIC init value

@@ -422,6 +422,11 @@ static void wakeup_source_activate(struct wakeup_source *ws)
 	if (!enable_wlan_wake_ws && !strcmp(ws->name, "wlan_wake"))
 		return;
 
+        if (!enable_msm_hsic_ws && !strcmp(ws->name, "msm_hsic_host")) {
+                pr_info("wakeup source msm_hsic_host activate skipped\n");
+                return;
+        }
+
 	/*
 	 * active wakeup source should bring the system
 	 * out of PM_SUSPEND_FREEZE state
